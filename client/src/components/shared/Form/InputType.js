@@ -15,6 +15,7 @@ const InputType = ({
           {labelText}
         </label>
         <input
+          id={labelFor}
           type={inputType}
           className="form-control"
           name={name}

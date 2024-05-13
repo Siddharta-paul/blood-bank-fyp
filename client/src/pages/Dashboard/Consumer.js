@@ -27,7 +27,7 @@ const Consumer = () => {
 
   useEffect(() => {
     getDonars();
-  }, []);
+  });
 
   return (
     <Layout>

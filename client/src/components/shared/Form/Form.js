@@ -152,7 +152,7 @@ const Form = ({ formType, submitBtn, formTitle }) => {
                   )}
 
                   <InputType
-                    labelText={"email"}
+                    labelText={"Email"}
                     labelFor={"forEmail"}
                     inputType={"email"}
                     name={"email"}
@@ -168,7 +168,7 @@ const Form = ({ formType, submitBtn, formTitle }) => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <InputType
-                    labelText={"website"}
+                    labelText={"Age"}
                     labelFor={"forWebsite"}
                     inputType={"text"}
                     name={"website"}
@@ -183,6 +183,15 @@ const Form = ({ formType, submitBtn, formTitle }) => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                   />
+                  <div className="mb-1">
+                    <label htmlFor="sex" className="form-label">Sex</label>
+                    <select id="sex" className="form-control">
+                      <option value="" disabled>Select Sex</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Others</option>
+                    </select>
+                  </div>
                   <InputType
                     labelText={"Phone"}
                     labelFor={"forPhone"}
