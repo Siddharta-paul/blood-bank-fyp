@@ -84,6 +84,7 @@ const Analytics = () => {
                 <th scope="col">Inventory Type</th>
                 <th scope="col">Quantity</th>
                 <th scope="col">Donor Email</th>
+                <th scope="col">Heart Rate</th>
                 <th scope="col">Time & Date</th>
               </tr>
             </thead>
@@ -94,6 +95,7 @@ const Analytics = () => {
                   <td>{record.inventoryType}</td>
                   <td>{record.quantity} (ML)</td>
                   <td>{record.email}</td>
+                  <td>{record.heartRate || ""}</td>
                   <td>{moment(record.createdAt).format("DD/MM/YYYY hh:mm A")}</td>
                 </tr>
               ))}
