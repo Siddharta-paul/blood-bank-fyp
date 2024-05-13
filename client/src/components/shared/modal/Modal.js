@@ -9,7 +9,10 @@ const Modal = () => {
   const [quantity, setQuantity] = useState(0);
   const [email, setEmail] = useState("");
   const { user } = useSelector((state) => state.auth);
-  // handle modal data
+  const [showProgressBar, setShowProgressBar] = useState(false);
+  const [heartRate, setHeartRate] = useState(null);
+
+  // Function to handle modal submit
   const handleModalSubmit = async () => {
     try {
       if (!bloodGroup || !quantity) {
@@ -21,6 +24,7 @@ const Modal = () => {
         inventoryType,
         bloodGroup,
         quantity,
+        heartRate
       });
       if (data?.success) {
         alert("New Record Created");
@@ -33,6 +37,37 @@ const Modal = () => {
     }
   };
 
+  // Function to generate random heart rate
+  const generateHeartRate = () => {
+    const minHeartRate = 60;
+    const maxHeartRate = 100;
+    const randomHeartRate = Math.floor(
+      Math.random() * (maxHeartRate - minHeartRate + 1) + minHeartRate
+    );
+    setHeartRate(randomHeartRate);
+  };
+
+  // Function to simulate progress bar filling up over 3 seconds
+  const simulateProgressBar = () => {
+    setShowProgressBar(true);
+    let progress = 0;
+    const increment = 1; // Increase in progress per millisecond
+    const interval = 30; // Update interval in milliseconds
+    const totalProgress = 100;
+    const duration = 10000; // Animation duration in milliseconds
+    const incrementAmount = (increment * interval * totalProgress) / duration;
+
+    const progressBarInterval = setInterval(() => {
+      progress += incrementAmount;
+      if (progress >= totalProgress) {
+        clearInterval(progressBarInterval);
+        generateHeartRate();
+        setShowProgressBar(false); // Hide progress bar after completion
+      }
+      document.getElementById("progress-bar").style.width = `${progress}%`;
+    }, interval);
+  };
+  
   return (
     <>
       {/* Modal */}
@@ -119,6 +154,42 @@ const Modal = () => {
                 onChange={(e) => setQuantity(e.target.value)}
               />
             </div>
+             {/* Button to generate heart rate */}
+              <button
+                type="button"
+                className="btn btn-primary mt-3"
+                style={{width: "40%", margin: "auto"}}
+                onClick={simulateProgressBar}
+                disabled={showProgressBar}
+
+              >
+                Measure Heart Rate
+              </button>
+
+              {showProgressBar && (
+              <div className="progress mt-3" style={{
+                width: "90%",
+                margin: "auto"
+              }}>
+                <div
+                  className="progress-bar"
+                  role="progressbar"
+                  style={{ width: "0%" }}
+                  aria-valuenow="0"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  id="progress-bar"
+                ></div>
+              </div>
+            )}
+            {!showProgressBar && (
+              <div className="mt-3" style={{
+                width: "90%",
+                margin: "auto"
+              }}>
+                <p>Measured Heart Rate: {heartRate}</p>
+              </div>
+            )}
             <div className="modal-footer">
               <button
                 type="button"

@@ -84,7 +84,7 @@ const createInventoryController = async (req, res) => {
     console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Errro In Create Inventory API",
+      message: "Error In Create Inventory API",
       error,
     });
   }
