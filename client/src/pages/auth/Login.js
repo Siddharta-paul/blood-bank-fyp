@@ -5,17 +5,26 @@ import Spinner from "./../../components/shared/Spinner";
 
 const Login = () => {
   const { loading, error } = useSelector((state) => state.auth);
+
   return (
     <>
-      {error && <span>{alert(error)}</span>}
+      {error && <div className="alert alert-danger">{error}</div>}
       {loading ? (
         <Spinner />
       ) : (
         <div className="row g-0">
-          <div className="col-md-8 form-banner">
-            <img src="./assets/images/banner1.jpg" alt="loginImage" />
+          <div className="col-lg-8 col-md-12 form-banner">
+            <img
+              src="./assets/images/banner1.jpeg"
+              alt="loginImage"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/assets/images/defaultBanner.jpg";
+              }}
+              className="img-fluid"
+            />
           </div>
-          <div className="col-md-4 form-container">
+          <div className="col-lg-4 col-md-12 form-container">
             <Form
               formTitle={"Login Page"}
               submitBtn={"Login"}

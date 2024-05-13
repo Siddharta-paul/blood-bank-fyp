@@ -12,13 +12,12 @@ const HomePage = () => {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
-  //get function
+  // Function to fetch blood records
   const getBloodRecords = async () => {
     try {
       const { data } = await API.get("/inventory/get-inventory");
       if (data?.success) {
         setData(data?.inventory);
-        // console.log(data);
       }
     } catch (error) {
       console.log(error);
@@ -28,25 +27,26 @@ const HomePage = () => {
   useEffect(() => {
     getBloodRecords();
   }, []);
+
   return (
     <Layout>
       {user?.role === "admin" && navigate("/admin")}
-      {error && <span>{alert(error)}</span>}
+      {error && <div className="alert alert-danger">{error}</div>}
       {loading ? (
         <Spinner />
       ) : (
-        <>
-          <div className="container">
-            <h4
-              className="ms-4"
-              data-bs-toggle="modal"
-              data-bs-target="#staticBackdrop"
-              style={{ cursor: "pointer" }}
-            >
-              <i className="fa-solid fa-plus text-success py-4"></i>
-              Add Inventory
-            </h4>
-            <table className="table ">
+        <div className="container">
+          <h4
+            className="ms-4"
+            data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop"
+            style={{ cursor: "pointer" }}
+          >
+            <i className="fa-solid fa-plus text-success py-4"></i>
+            Add Inventory
+          </h4>
+          <div className="table-responsive">
+            <table className="table">
               <thead>
                 <tr>
                   <th scope="col">Blood Group</th>
@@ -70,10 +70,9 @@ const HomePage = () => {
                 ))}
               </tbody>
             </table>
-
-            <Modal />
           </div>
-        </>
+          <Modal />
+        </div>
       )}
     </Layout>
   );
