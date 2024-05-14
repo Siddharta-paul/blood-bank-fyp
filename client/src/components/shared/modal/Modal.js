@@ -18,6 +18,7 @@ const Modal = () => {
   const [isError, setIsError] = useState(false)
 
   const measuringInterval = useRef(null);
+  const heartRatesArrayLength = useRef(0)
 
   // Function to handle modal submit
   const handleModalSubmit = async () => {
@@ -47,39 +48,49 @@ const Modal = () => {
   // Function to generate random heart rate
   const generateHeartRate = () => {
     const minHeartRate = 60;
-    const maxHeartRate = 100;
+    const maxHeartRate = 115;
     const randomHeartRate = Math.floor(
       Math.random() * (maxHeartRate - minHeartRate + 1) + minHeartRate
     );
     return randomHeartRate;
   };
 
+  const stopMeasuring = () => {
+    const avg = Math.round(heartRates.reduce((sum, currentValue) => sum + currentValue, 0) / heartRates.length);
+    if(!isNaN(avg)) {
+      setHeartRate(avg)
+    }
+    setHeartRates([])
+    heartRatesArrayLength.current = 0;
+    clearInterval(measuringInterval.current)
+    return setIsMeasuring(false)
+  }
+
   // Function to simulate progress bar filling up over 3 seconds
   const simulateProgressBar = async () => {
     setIsError(false)
     if(isMeasuring) {
-      console.log(measuringInterval.current)
-      clearInterval(measuringInterval.current)
-      return setIsMeasuring(false)
+      return stopMeasuring()
     }
     setIsMeasuring(true)
+    setHeartRate(null)
     
     setHeartRates([]);
+    heartRatesArrayLength.current = 0;
     const interval = 1500; // Update interval in milliseconds
 
     const docRef = doc(getFirestore(), "super", "NYDtGNpragrFiM1Wpa4y")
     const docSnap = await getDoc(docRef);
-    console.log(docSnap.data.superKey);
+    
     if(!(docSnap.exists() && docSnap.data().superKey===true)) {
       return setIsError(true);
     }
 
     measuringInterval.current = setInterval(() => {
-      if (heartRates.length >= 30) {
-        clearInterval(measuringInterval.current);
-        // generateHeartRate();
-        // setShowProgressBar(false); // Hide progress bar after completion
+      if (heartRatesArrayLength.current >= 30) {
+        return stopMeasuring()
       }
+      heartRatesArrayLength.current++
       setHeartRates(prev => {
         return [...prev, generateHeartRate()];
       })
@@ -182,27 +193,35 @@ const Modal = () => {
                 {isMeasuring ? "Stop" : "Measure Heart Rate"}
               </button>
             
+            {isMeasuring && (
+              <div className="mt-3" style={{
+                width: "90%",
+                margin: "auto"
+              }}>
+                <p>Measured Heart Rate</p>
+              </div>
+            )}
+            {heartRate && (
+              <div className="mt-3" style={{
+                width: "90%",
+                margin: "auto"
+              }}>
+                <p>Average Heart Rate: {heartRate}</p>
+              </div>
+            )}
             <div style={{
               display: 'flex',
               flexDirection: 'column',
               maxHeight: '10rem',
               overflowY: 'scroll'
-            }}>  
-              {isMeasuring && (
-                <div className="mt-3" style={{
-                  width: "90%",
-                  margin: "auto"
-                }}>
-                  <p>Measured Heart Rate</p>
-                </div>
-              )}
-              {heartRates.map((rate) => {
+            }} id="measuring">  
+              {heartRates.map((rate, idx) => {
                 return (
-                  <div key={rate} className="mt-3" style={{
+                  <div key={idx} className="mt-3" style={{
                     width: "90%",
                     margin: "auto"
                   }}>
-                    <p>{rate }</p>
+                    <p>{rate}</p>
                   </div>
                 )
               })}
