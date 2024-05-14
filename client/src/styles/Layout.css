@@ -36,5 +36,6 @@
 
 .active a,
 .active i {
-  color: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+  /* color: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045); */
+  color: black;
 }

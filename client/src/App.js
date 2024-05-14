@@ -16,7 +16,20 @@ import DonarList from "./pages/Admin/DonarList";
 import HospitalList from "./pages/Admin/HospitalList";
 import OrgList from "./pages/Admin/OrgList";
 import AdminHome from "./pages/Admin/AdminHome";
+import { initializeApp } from "firebase/app";
 function App() {
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCF-npj7pHN0UYGrrxJT8DW2ydtf6rKRCk",
+    authDomain: "smart-health-monitor-6a303.firebaseapp.com",
+    databaseURL: "https://smart-health-monitor-6a303-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "smart-health-monitor-6a303",
+    storageBucket: "smart-health-monitor-6a303.appspot.com",
+    messagingSenderId: "847698031835",
+    appId: "1:847698031835:web:5626f4bede8183eb0d88fe"
+  };
+
+  initializeApp(firebaseConfig);
   return (
     <>
       <ToastContainer />

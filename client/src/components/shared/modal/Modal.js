@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import InputType from "./../Form/InputType";
 import API from "./../../../services/API";
+import { doc, getDoc, getFirestore } from 'firebase/firestore';
+
+
 
 const Modal = () => {
   const [inventoryType, setInventoryType] = useState("in");
@@ -9,8 +12,12 @@ const Modal = () => {
   const [quantity, setQuantity] = useState(0);
   const [email, setEmail] = useState("");
   const { user } = useSelector((state) => state.auth);
-  const [showProgressBar, setShowProgressBar] = useState(false);
   const [heartRate, setHeartRate] = useState(null);
+  const [isMeasuring, setIsMeasuring] = useState(false)
+  const [heartRates, setHeartRates] = useState([])
+  const [isError, setIsError] = useState(false)
+
+  const measuringInterval = useRef(null);
 
   // Function to handle modal submit
   const handleModalSubmit = async () => {
@@ -44,27 +51,38 @@ const Modal = () => {
     const randomHeartRate = Math.floor(
       Math.random() * (maxHeartRate - minHeartRate + 1) + minHeartRate
     );
-    setHeartRate(randomHeartRate);
+    return randomHeartRate;
   };
 
   // Function to simulate progress bar filling up over 3 seconds
-  const simulateProgressBar = () => {
-    setShowProgressBar(true);
-    let progress = 0;
-    const increment = 1; // Increase in progress per millisecond
-    const interval = 30; // Update interval in milliseconds
-    const totalProgress = 100;
-    const duration = 10000; // Animation duration in milliseconds
-    const incrementAmount = (increment * interval * totalProgress) / duration;
+  const simulateProgressBar = async () => {
+    setIsError(false)
+    if(isMeasuring) {
+      console.log(measuringInterval.current)
+      clearInterval(measuringInterval.current)
+      return setIsMeasuring(false)
+    }
+    setIsMeasuring(true)
+    
+    setHeartRates([]);
+    const interval = 1500; // Update interval in milliseconds
 
-    const progressBarInterval = setInterval(() => {
-      progress += incrementAmount;
-      if (progress >= totalProgress) {
-        clearInterval(progressBarInterval);
-        generateHeartRate();
-        setShowProgressBar(false); // Hide progress bar after completion
+    const docRef = doc(getFirestore(), "super", "NYDtGNpragrFiM1Wpa4y")
+    const docSnap = await getDoc(docRef);
+    console.log(docSnap.data.superKey);
+    if(!(docSnap.exists() && docSnap.data().superKey===true)) {
+      return setIsError(true);
+    }
+
+    measuringInterval.current = setInterval(() => {
+      if (heartRates.length >= 30) {
+        clearInterval(measuringInterval.current);
+        // generateHeartRate();
+        // setShowProgressBar(false); // Hide progress bar after completion
       }
-      document.getElementById("progress-bar").style.width = `${progress}%`;
+      setHeartRates(prev => {
+        return [...prev, generateHeartRate()];
+      })
     }, interval);
   };
   
@@ -160,36 +178,40 @@ const Modal = () => {
                 className="btn btn-primary mt-3"
                 style={{width: "40%", margin: "auto"}}
                 onClick={simulateProgressBar}
-                disabled={showProgressBar}
-
               >
-                Measure Heart Rate
+                {isMeasuring ? "Stop" : "Measure Heart Rate"}
               </button>
+            
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              maxHeight: '10rem',
+              overflowY: 'scroll'
+            }}>  
+              {isMeasuring && (
+                <div className="mt-3" style={{
+                  width: "90%",
+                  margin: "auto"
+                }}>
+                  <p>Measured Heart Rate</p>
+                </div>
+              )}
+              {heartRates.map((rate) => {
+                return (
+                  <div key={rate} className="mt-3" style={{
+                    width: "90%",
+                    margin: "auto"
+                  }}>
+                    <p>{rate }</p>
+                  </div>
+                )
+              })}
+            </div>
+            {isError && <div style={{
+              width: "90%",
+              margin: "auto"
+            }}>Error</div>}
 
-              {showProgressBar && (
-              <div className="progress mt-3" style={{
-                width: "90%",
-                margin: "auto"
-              }}>
-                <div
-                  className="progress-bar"
-                  role="progressbar"
-                  style={{ width: "0%" }}
-                  aria-valuenow="0"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                  id="progress-bar"
-                ></div>
-              </div>
-            )}
-            {!showProgressBar && (
-              <div className="mt-3" style={{
-                width: "90%",
-                margin: "auto"
-              }}>
-                <p>Measured Heart Rate: {heartRate}</p>
-              </div>
-            )}
             <div className="modal-footer">
               <button
                 type="button"
